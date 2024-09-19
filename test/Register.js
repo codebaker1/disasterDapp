@@ -61,10 +61,11 @@ describe("RegisterDisaster contract", function () {
         it("Should get all people", async () => {
             await registerDisaster.registerPerson("1234567890", "John", "Doe", "123 Main St");
             await registerDisaster.registerPerson("1234567891", "Jane", "Doe", "456 Main St");
+            
             const allPeople = await registerDisaster.getAll();
-            expect(allPeople.length).to.equal(2);
+            expect(allPeople.length).to.equal(2); // Check the correct number of people
             expect(allPeople[0].idCard).to.equal("1234567890");
             expect(allPeople[1].idCard).to.equal("1234567891");
         });
-    });
+    });    
 });

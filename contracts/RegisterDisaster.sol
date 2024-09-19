@@ -2,42 +2,62 @@
 pragma solidity ^0.8.24;
 
 contract RegisterDisaster {
-    address public owner;   // เก็บข้อมูลของเจ้าของ Smart Contract (ใช้ใน Constructor)
+    address public owner;   // Owner of the contract
+
+    // Struct to store personal information
     struct Person {
-        string idCard;      // รหัสบัตรประชาชน
-        string firstName;   // ชื่อ
-        string lastName;    // นามสกุล
-        string addr;        // ที่อยู่
+        string idCard;      // National ID
+        string firstName;   // First name
+        string lastName;    // Last name
+        string addr;        // Address
     }
 
-    Person[] private people; // สร้างตัวแปรอาเรย์ของประเภท Person เพื่อเก็บข้อมูลผู้คนที่จะลงทะเบียน
-    mapping(string => uint256) private idToIndex; // สร้างตัวแปรแมพของประเภท uint256 เพื่อเก็บข้อมูลดัชนีของผู้คนตามรหัสบัตรประชาชน
+    Person[] private people; // Array to store people registered
+    mapping(string => uint256) private idToIndex; // Map ID to index in the people array
+    string[] private idList; // List to keep track of all IDs
 
-    // constructor คือฟังก์ชันที่จะถูกเรียกใช้งานเมื่อมีการสร้างอินสแตนซ์ของ Smart Contract
-    // msg.sender คือตัวแปรที่จะเก็บข้อมูลของผู้ที่สร้างอินสแตนซ์ของ Smart Contract
+    // Constructor to set the contract owner
     constructor() {
-       
+        owner = msg.sender;  // Set the owner to the address deploying the contract
     }
 
-    // ฟังก์ชันสำหรับลงทะเบียนผู้เข้าร่วม
-    function registerPerson(string memory _idCard, string memory _firstName, string memory _lastName, string memory _address) public {
+    // Function to register a new person
+    function registerPerson(
+        string memory _idCard, 
+        string memory _firstName, 
+        string memory _lastName, 
+        string memory _address
+    ) public {
+        // Add a new person to the array
+        people.push(Person(_idCard, _firstName, _lastName, _address));
 
+        // Store the index of the new person in the mapping
+        idToIndex[_idCard] = people.length - 1;
 
+        // Add the ID to the list of all IDs
+        idList.push(_idCard);
     }
 
-    // ฟังก์ชันสำหรับขอข้อมูลผู้เข้าร่วมทั้งหมด
+    // Function to get all registered people
     function getAll() public view returns (Person[] memory) {
-        
-    }
+    return people; // Return the array of registered people
+}
 
-    // ฟังก์ชันสำหรับขอข้อมูลผู้เข้าร่วมที่มี index ที่กำหนด (ควรอ้างอิง index จากการลงทะเบียน)
+
+    // Function to get a person by index
     function getPerson(uint256 index) public view returns (Person memory) {
-        
+        require(index < people.length, "Index out of bounds");
+        return people[index];
     }
 
-    // ฟังก์ชันสำหรับขอข้อมูลผู้เข้าร่วมที่มี idCard ที่กำหนด
-    // ใช้ idToIndex เพื่อหาดัชนีของผู้เข้าร่วมที่มี idCard ตรงกัน
+    // Function to get a person by their ID card
     function getID(string memory _idCard) public view returns (Person memory) {
-        
+    // Check if the person exists in the mapping
+    require(idToIndex[_idCard] < people.length, "Person not found");
+
+    uint256 index = idToIndex[_idCard];
+    return people[index];
     }
+
+
 }
